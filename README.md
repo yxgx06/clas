@@ -119,4 +119,7 @@ None of those are marketing problems to paper over. They're engineering problems
 
 *ASTRA: the bodyguard that lives inside your call. It doesn't stop the scammer from calling. It stops you from paying.*
 
-
+<div align="center">
+  <br>
+  <h3><a href="./technical_details.md">📖 View the Complete Technical Deep Dive & Challenges Here</a></h3>
+</div>
