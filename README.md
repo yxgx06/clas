@@ -45,6 +45,7 @@ This is the story of **ASTRA** — a system built to occupy the one part of the 
 - [This news segment breaks down the exact timeline of the Delhi doctor couple's digital arrest, illustrating the sustained psychological manipulation your system is built to intercept](https://www.youtube.com/watch?v=AsKbc-P5BcY)
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
+
 ## Part 1: The Empty Middle Column
 
 ![Gemini Generated Image](./assets/gemini_custom_image.png)
@@ -66,6 +67,7 @@ The one-line pitch we built the entire system around:
 > *"ASTRA is the only defense layer that operates during the six hours between a scam call starting and the money leaving — it doesn't just listen to what's said, it watches who's saying it, tracks the coercion script in real time, and physically breaks the payment path before the victim's own judgment gets there."*
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
+
 ## Part 2: The Core Insight — Scams Aren't Improvised, They're Scripted
 
 ![Second Gemini Generated Image](./assets/gemini_custom_image_2.png)
@@ -85,6 +87,7 @@ The single most important engineering decision in ASTRA comes from a hypothesis 
 Why does sequence matter so much? Because a call that opens with Phase 5 language — a legitimate bank calling about a fraudulent OTP — scores fundamentally differently from a call that reaches Phase 5 only *after* Phases 1→3→4 have fired in order. A system that scores markers as an unordered bag cannot make this distinction. A system that tracks them as an ordered arc can. This single architectural choice is the strongest answer to the most common objection a system like this receives: *"isn't this just keyword matching?"*
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
+
 ## Part 12: The 3-Minute Demo, Beat by Beat
 
 ![Circuit Breaker Interception UI](./assets/circuit_breaker_ui.png)
@@ -102,6 +105,7 @@ Why does sequence matter so much? Because a call that opens with Phase 5 languag
 The rehearsal discipline behind this: both phones on shared WiFi, backend deployed (never localhost during a live demo), judge's phone pre-registered as a trusted contact, the scam script rehearsed verbatim in exact order, GPay pre-launched, and — critically — a full screen-recorded fallback video always on hand. Never demo a broken pipeline live.
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
+
 ## Epilogue: What This Project Actually Is
 
 Strip away the acronyms and the risk-fusion formula, and ASTRA is an attempt to answer one specific, narrow question: **can a piece of software recognize, in real time, that a person is being psychologically coerced — and can it act on that recognition faster than the coercion can complete itself?**
@@ -112,5 +116,6 @@ None of those are marketing problems to paper over. They're engineering problems
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 *ASTRA: the bodyguard that lives inside your call. It doesn't stop the scammer from calling. It stops you from paying.*
+
 
 
