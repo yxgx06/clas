@@ -47,7 +47,7 @@ This is the story of **ASTRA** — a system built to occupy the one part of the 
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
-## Part 1: The Empty Middle Column
+## The Empty Middle Column
 
 ![Gemini Generated Image](./assets/gemini_custom_image.png)
 
@@ -69,7 +69,7 @@ The one-line pitch we built the entire system around:
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
-## Part 2: The Core Insight — Scams Aren't Improvised, They're Scripted
+## The Core Insight — Scams Aren't Improvised, They're Scripted
 
 ![Second Gemini Generated Image](./assets/gemini_custom_image_2.png)
 
@@ -89,7 +89,7 @@ Why does sequence matter so much? Because a call that opens with Phase 5 languag
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
-## Part 3: The 3-Minute Demo, Beat by Beat
+## The 3-Minute Demo, Beat by Beat
 
 ![Circuit Breaker Interception UI](./assets/circuit_breaker_ui.png)
 
