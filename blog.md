@@ -2,7 +2,7 @@
   <img src="./assets/hackathon_topic.png" width="450" alt="PEC Hacks 4.0">
 </div>
 
-<hr style="border: 2px solid #333; margin: 30px 0;">
+<hr style="border: 4px solid #111; margin: 30px 0;">
 
 <div align="center">
   <h2><strong>Team Name</strong></h2>
@@ -12,7 +12,7 @@
   <img src="./assets/team_logo.png" width="280" alt="PromptVibers Logo">
 </div>
 
-<hr style="border: 2px solid #333; margin: 30px 0;">
+<hr style="border: 4px solid #111; margin: 30px 0;">
 
 <div align="center">
   <h1><strong>ASTRA</strong></h1>
@@ -27,7 +27,7 @@
 
 ### How a three-member team engineered a real-time, on-device AI system to detect scam calls as they happen — and physically stop the money before it moves
 
-<hr style="border: 2px solid #333; margin: 40px 0;">
+<hr style="border: 4px solid #111; margin: 40px 0;">
 
 ## Prologue: A 92-Year-Old Man, Two Days, Two Crore Rupees
 
@@ -46,7 +46,7 @@ This is the story of **ASTRA** — a system built to occupy the one part of the 
 - [Elderly couple duped of Rs 2.5 crore in Chandigarh, kept under digital arrest for 15 days](https://www.ptcnews.tv/nation/elderly-couple-duped-of-rs-2-crore-in-chandigarh-kept-under-digital-arrest-for-15-days-4425251)
 - [This news segment breaks down the exact timeline of the Delhi doctor couple's digital arrest, illustrating the sustained psychological manipulation your system is built to intercept](https://www.youtube.com/watch?v=AsKbc-P5BcY)
 
-<hr style="border: 2px solid #333; margin: 40px 0;">
+<hr style="border: 4px solid #111; margin: 40px 0;">
 
 ## The Empty Middle Column
 
@@ -68,7 +68,7 @@ The one-line pitch we built the entire system around:
 
 > *"ASTRA is the only defense layer that operates during the six hours between a scam call starting and the money leaving — it doesn't just listen to what's said, it watches who's saying it, tracks the coercion script in real time, and physically breaks the payment path before the victim's own judgment gets there."*
 
-<hr style="border: 2px solid #333; margin: 40px 0;">
+<hr style="border: 4px solid #111; margin: 40px 0;">
 
 ## The Core Insight — Scams Aren't Improvised, They're Scripted
 
@@ -88,7 +88,7 @@ The single most important engineering decision in ASTRA comes from a hypothesis 
 
 Why does sequence matter so much? Because a call that opens with Phase 5 language — a legitimate bank calling about a fraudulent OTP — scores fundamentally differently from a call that reaches Phase 5 only *after* Phases 1→3→4 have fired in order. A system that scores markers as an unordered bag cannot make this distinction. A system that tracks them as an ordered arc can. This single architectural choice is the strongest answer to the most common objection a system like this receives: *"isn't this just keyword matching?"*
 
-<hr style="border: 2px solid #333; margin: 40px 0;">
+<hr style="border: 4px solid #111; margin: 40px 0;">
 
 ## The 3-Minute Demo, Beat by Beat
 
@@ -106,7 +106,7 @@ Why does sequence matter so much? Because a call that opens with Phase 5 languag
 
 The rehearsal discipline behind this: both phones on shared WiFi, backend deployed (never localhost during a live demo), judge's phone pre-registered as a trusted contact, the scam script rehearsed verbatim in exact order, GPay pre-launched, and — critically — a full screen-recorded fallback video always on hand. Never demo a broken pipeline live.
 
-<hr style="border: 2px solid #333; margin: 40px 0;">
+<hr style="border: 4px solid #111; margin: 40px 0;">
 
 ## Epilogue: What This Project Actually Is
 
@@ -116,7 +116,7 @@ The honest answer, built into every design decision here, is: *mostly, and imper
 
 None of those are marketing problems to paper over. They're engineering problems to keep solving, one redundant path and one gated threshold at a time — which is the actual difference between a hackathon pitch and a system someone might eventually trust with their life savings.
 
-<hr style="border: 2px solid #333; margin: 40px 0;">
+<hr style="border: 4px solid #111; margin: 40px 0;">
 
 *ASTRA: the bodyguard that lives inside your call. It doesn't stop the scammer from calling. It stops you from paying.*
 
