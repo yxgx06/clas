@@ -146,6 +146,11 @@ The reasoning behind why this specifically targets the 51%-non-reporting statist
 
 ## Part 4: The Multimodal Layer — Why Deepfake Detection Is Gated, Not Primary
 
+<div align="center">
+  <img src="./assets/multimodal_architecture.png" width="800" alt="Multimodal Layer Architecture">
+</div>
+<br>
+
 Digital-arrest scams increasingly involve fabricated police uniforms, fake station backdrops, and — as deepfake tooling commoditizes — real-time face-swap or voice-cloned video. ASTRA's video pipeline runs three checks locally at 2fps:
 
 1. **Frequency-domain artifact detection** — GAN/diffusion-synthesized faces leave characteristic high-frequency spectral artifacts absent from camera-native footage. A lightweight CNN applies a 2D FFT to the face crop and scores the energy distribution against a learned natural-camera-noise prior.
@@ -200,6 +205,11 @@ Since zero real annotated scam transcripts exist for either language, we built a
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
 ## Part 6: Evaluation — Proving It's Not Just an LLM Wrapper
+
+<div align="center">
+  <img src="./assets/evaluation_graph.png" width="800" alt="Evaluation Performance Graph">
+</div>
+<br>
 
 The single most common objection any system like this receives is "isn't this just regex with extra steps?" The answer has to be data, not assertion. ASTRA's eval plan runs four configurations against the same held-out adversarial set:
 
