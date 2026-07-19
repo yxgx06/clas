@@ -347,7 +347,7 @@ Building ASTRA required solving 15 hard engineering problems. Here are the chall
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
-## Part 8: What Judges Will Actually Push On
+## Part 8: Addressing Key Technical Criticisms & FAQ
 
 Presenting a system this ambitious invites five predictable attack lines, each with a rehearsed, honest response:
 
