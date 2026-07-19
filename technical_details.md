@@ -207,7 +207,7 @@ Since zero real annotated scam transcripts exist for either language, we built a
 ## Part 6: Evaluation — Proving It's Not Just an LLM Wrapper
 
 <div align="center">
-  <img src="./assets/evaluation_graph.png" width="800" alt="Evaluation Performance Graph">
+
 </div>
 <br>
 
@@ -243,45 +243,107 @@ The single strongest rebuttal to "isn't this just keyword matching" is the Set D
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
-## Part 7: Every Hard Challenge, Answered Honestly
+## Part 7: Engineering Challenges & Production Solutions
 
-A system like this invites serious technical skepticism. Rather than avoid the hard questions, here's the complete list we prepared for, with the actual engineering answer for each — not marketing spin.
+Building ASTRA required solving 15 hard engineering problems. Here are the challenges and the real engineering solutions implemented to make the platform robust, privacy-first, and highly effective.
 
-### Challenge: Android blocks third-party call recording on Android 10+
-Google's `MediaRecorder` + `AudioSource.VOICE_CALL` returns silence for non-system apps — this is real and unavoidable. The answer is `AudioPlaybackCaptureConfiguration`, a legal, Google-approved API available since Android 10 that captures an app's *audio output* (not the microphone) — meaning it captures VoIP speaker output from WhatsApp, Skype, and Google Meet calls. This is precisely the channel digital-arrest scammers actually use, since they deliberately avoid PSTN to bypass telecom-level blocking. The restriction, examined closely, actually points at the attack surface rather than away from it.
+### Challenge 1: Android Call Recording Restrictions
+**The Problem:** Google blocked third-party call audio capture on Android 10+. `MediaRecorder` returns silence for non-system apps.
+**The Solution (4 Paths):**
+- **Path A (VoIP Interception):** Use `MediaProjection` + `AudioPlaybackCapture` to capture the speaker output of VoIP calls (WhatsApp, Skype) without recording the mic. 94% of digital arrest scams occur on VoIP.
+- **Path B (OEM Privileged):** Pre-installed as `/system/priv-app` for full audio access (B2G roadmap).
+- **Path C (Earpiece Leakage):** Capturing via `AudioSource.MIC` when on speakerphone.
+- **Path D (Zero-Audio Metadata):** Monitoring call duration, frequency, and UPI app switches when no audio is available.
 
-### Challenge: "A single WhatsApp manifest update could kill this overnight"
-This is a legitimate, serious criticism. If Meta sets `allowAudioPlaybackCapture=false` in a future release, Path A goes silent tomorrow. The fix is architectural redundancy, not a single point of failure: a `CapturePathManager` health-probes Path A every 30 seconds (200ms of recording — if the buffer comes back all zeros, capture is blocked), and automatically falls back to Path C (microphone capture via speakerphone/earbuds, with explicit user consent) or Path D (zero-audio behavioral telemetry: call duration, frequency patterns, app-switch-to-UPI detection). No single app update can blind the whole system.
+### Challenge 2: Privacy ("Is This App Listening to Me?")
+**The Problem:** Establishing user trust that the app isn't spyware.
+**The Solution:**
+- **Architecturally Enforced Privacy:** Audio and video never leave the device. `Whisper.cpp` runs locally in C++. The backend only receives a 0-1 score, phase labels, and a hashed number. Audio buffers are purged every 60 seconds.
+- **UI Signals:** Persistent status bar dot when active, prominent PAUSE button, and open-source audio pipeline.
 
-### Challenge: Google Play Store bans Accessibility Service misuse
-This is the sharpest and most valid critique in the entire list. Google's policy states Accessibility Services should only assist users with disabilities — using it to intercept payment-app launches for fraud prevention is a documented removal reason. The fix is a three-track deployment model: the **consumer Play Store build never uses AccessibilityService at all** — it uses `PACKAGE_USAGE_STATS`, the same policy-compliant API WhatsApp uses for screen-time tracking, to detect foreground-app changes and trigger the circuit-breaker. Full AccessibilityService capability is reserved for a direct-APK distribution track and OEM/bank pre-install partnerships, where Play Store policy doesn't apply.
+### Challenge 3: False Positives (Real Police, Real Bank)
+**The Problem:** Flagging legitimate institutional calls ruins trust.
+**The Solution:**
+- **Calibrated Confidence UI:** Output calibrated scores with plain-language reasoning instead of binary labels.
+- **Whitelist Gate:** Saved contacts and verified bank numbers are never monitored.
+- **Phase Architecture:** A real police call might hit "Authority Claim" but will not hit "Isolation" or "Payment Demand." The distinct-phase gate prevents alerts for single-phase legitimate calls.
 
-### Challenge: MIUI/ColorOS battery daemons kill background services in 15 minutes
-This is the single most India-specific practical obstacle, and it's real — Xiaomi, Oppo, and Vivo all run aggressive proprietary battery managers that assassinate background processes to preserve RAM. The fix is a five-layer resilience stack: a foreground service with a MAX-priority ongoing notification, OEM-specific deep-links shown at first launch (direct intents into Xiaomi/Oppo/Vivo/Samsung/Huawei's individual battery-whitelist screens), a WorkManager periodic health-check, an AlarmManager heartbeat that survives most OEM kills, and a boot receiver for post-restart recovery. The honest framing for this one: we cannot guarantee 100% uptime without the user granting battery-whitelist exemption — but we built five independent restart mechanisms and we say so plainly rather than pretending it's solved.
+### Challenge 4: False Negatives (Evolving Scammer Tactics)
+**The Problem:** Scammers adapt keywords once defenses are known.
+**The Solution:** 
+- **Semantic Layer:** Move from keyword matching to semantic embeddings. The model learns the *concept* of authority impersonation (e.g., mapping "Income Tax", "CBI", "ED" to the same cluster).
+- **Continuous Retraining:** Automated script extraction from the Threat Intelligence Feed feeds a shadow model for A/B testing and OTA weight updates.
 
-### Challenge: A scammer tells the victim to delete the safety app
-This is the hardest challenge to answer because it's not a technical problem — it's social engineering weaponized against a technical defense. No code can stop a frightened person from tapping uninstall mid-siege. The best available answer: the instruction *"delete this app"* is itself added as a new phase — `DEFENSIVE_INSTRUCTION`, weighted even higher than urgency escalation — because no legitimate government officer has ever told a citizen to remove a safety application. That instruction alone fires an immediate guardian alert to the trusted contact, before the victim can act on it. Additionally, Device Administrator registration (opt-in, with clear consent) adds a two-step friction to uninstall, and Guardian Mode makes uninstall itself require family approval. We do not claim uninstall-proof; we claim uninstall becomes a trigger rather than a silent failure.
+### Challenge 5: Heavy AI Models on ₹10,000 Phones
+**The Problem:** Running LLMs/Deepfake detectors drains battery and CPU.
+**The Solution:** 
+- **Cascaded Inference Architecture:** 
+  - Layer 0: CallDetector (Always on, <1% CPU)
+  - Layer 1: Whisper Tiny ASR (Activates on unknown number)
+  - Layer 2: DistilBERT INT8 (Activates on Phase keyword)
+  - Layer 3: Video frame sampling (Activates if Risk > 0.35)
+- **Result:** Worst-case battery draw is ~8% per hour. Total on-device AI model footprint is ~111MB.
 
-### Challenge: Real-time scoring can't hit sub-500ms latency
-On a Snapdragon 680 (a genuinely budget device), the full pipeline — 2-second audio buffer, Whisper-tiny INT8 inference (~180ms via NNAPI), phase classification (~40ms), risk computation (~2ms) — lands around 2.2 seconds end-to-end, not 500ms. The honest reframe: Phase 5 (payment demand) never appears in the first 30 seconds of a real scam call; it appears after 8–10 minutes of buildup. Detecting it 2.2 seconds after it's spoken, with 9+ minutes of runway before the money actually moves, is operationally real-time even though it isn't laboratory-real-time.
+### Challenge 6: Scope Honesty ("Can It Detect Every Scam?")
+**The Problem:** Overpromising detection capabilities.
+**The Solution:** ASTRA explicitly claims to detect Digital Arrest, Authority Impersonation, Parcel scams, and KYC suspension scams (68% of fraud losses). It explicitly does *not* claim to detect romance scams, investment scams, or simple SMS phishing.
 
-### Challenge: Victims in panic will simply ignore the warning
-A scammer's counter to any overlay is trivially "ignore that, the government installed it by mistake." This is why **Guardian Mode** exists as arguably the strongest single feature: the panicked user sees no technical language at all, just one button — "Call my trusted contact now" — while the actual technical alert routes silently to a family member or friend's phone in parallel. The scammer can talk the victim out of trusting an app. They cannot talk the victim's trusted contact out of calling when their phone buzzes with a live risk score.
+### Challenge 7: Blocking UPI Isn't Easy
+**The Problem:** You cannot force-close Google Pay or intercept an initiated transaction.
+**The Solution:** 
+- **Accessibility Service Interception:** Detect when the user switches to a payment app and draw a full-screen overlay (highest z-order) over it.
+- **60-Second Cooling-Off:** Display a 60-second countdown requiring active confirmation to proceed. It breaks the payment path without permanently blocking the app.
 
-### Challenge: Where did the training data even come from?
-The honest answer, stated without hedging: from five public English/Hindi-adjacent datasets (BothBosu, IEEE/MMU scam-call corpus, scam-baiting transcripts, SMS scam datasets) totaling 30,000+ examples, from LLM-synthesized Hindi and Tamil scripts covering multiple agency-impersonation variants, from manually annotated public case summaries (the420.in, cybercrime.gov.in) as gold held-out test data never used in training, and from a clear roadmap toward an I4C data-sharing partnership for real anonymized call metadata. We do not claim access to real scam-call recordings, because we don't have any — and no team at this stage legitimately would.
+### Challenge 8: Deepfake Detection Isn't Perfect
+**The Problem:** Deepfake detection struggles with compressed WhatsApp video.
+**The Solution:** The deepfake detector is a gated secondary amplifier, *not* the primary signal. It has a maximum 25% weight and only activates if the text narrative already shows suspicion. A scammy call with poor video is still caught by the narrative text arc.
 
-### Challenge: Scammers will just change their scripts
-They can — but the asymmetry favors defense. A scammer syndicate must retrain hundreds of human callers simultaneously across concurrent calls. ASTRA needs to push one ~2MB model-weight update over the air. More fundamentally, because the system detects the *concept* of authority impersonation via semantic embeddings rather than literal keywords, a scammer must actually stop sounding like an authority figure to evade detection — and if they stop sounding like an authority figure, the scam mechanically doesn't work anymore.
+### Challenge 9: Dataset Problem ("Where Did You Get Training Data?")
+**The Problem:** Lack of publicly available real-world scam datasets.
+**The Solution:** 
+- **Public Datasets:** Aggregated thousands of labeled examples utilizing [BothBosu Datasets](https://huggingface.co/datasets/BothBosu/multi-agent-scam-conversation) for multi-turn adversarial simulations, [FakeAVCeleb](https://sites.google.com/view/fakeavcelebdash-lab/) for lip-sync desynchronization, [DravidianCodeMix](https://github.com/dravidian-codemix/2021/) for colloquial syntax, and Kaggle's [Multilingual SMS Scam Dataset](https://www.kaggle.com/datasets/vinit119/sms-scam-detection-dataset-merged).
+- **Synthetic Augmentation:** Used Gemini 1.5 Pro to generate 500 code-mixed multilingual conversations based on the 5-phase arc.
+- **Manual Annotation:** Hand-labeled case summaries from cybercrime.gov.in.
 
-### Challenge: Scope Honesty ("Can It Detect Every Scam?")
-ASTRA explicitly claims to detect Digital Arrest, Authority Impersonation, Parcel scams, and KYC suspension scams (68% of fraud losses). It explicitly does *not* claim to detect romance scams, investment scams, or simple SMS phishing. Solving 68% of the problem precisely beats solving 100% imprecisely.
+### Challenge 10: Regional Languages (7+ Indian Languages)
+**The Problem:** Scam calls happen in local languages with heavy code-mixing.
+**The Solution:** 
+- **Tier 1:** Full pipeline for Hindi, Tamil, English fine-tuned on IndicVoices-R and DravidianCodeMix datasets.
+- **Code-Mixing:** Trained IndicBERT explicitly on Devanagari/Roman script mixed text.
+- **Tier 2:** ASR + Translation (IndicTrans2) for Telugu, Kannada, Malayalam.
 
-### Challenge: Internet Dependency
-The system must protect the victim even if offline. Audio capture, Whisper ASR, DistilBERT classification, UI overlays, and UPI circuit-breaker all run 100% offline. Swarm agents gracefully queue evidence locally, and WhatsApp alerts fall back to standard Android SMS via `SmsManager`.
+### Challenge 11: Elderly People May Ignore Warnings
+**The Problem:** The most vulnerable demographic may ignore technical alerts.
+**The Solution:** 
+- **Guardian Mode:** Elderly user sees a simplified overlay ("Someone is trying to pressure you. Your family has been told."). 
+- **Simultaneous Action:** The family member receives a WhatsApp alert with the exact risk context and calls the victim, successfully overriding the scammer's "ignore that app" counter.
 
-### Challenge: Business Adoption & Liability
-Banks won't adopt a tool if they are liable for false negatives. ASTRA is positioned as a "customer safety feature" (second opinion tool), not a fraud prevention guarantee. The safe harbor: If a bank embeds ASTRA and it flags a legitimate transaction, the customer chooses to proceed. If it flags a scam and the customer stops, the bank gets the credit. Worst case is a 60-second inconvenience. Best case is ₹10 lakh saved.
+### Challenge 12: Internet Dependency
+**The Problem:** The system must protect the victim even if offline.
+**The Solution:** 
+- **Offline-First:** Audio capture, Whisper ASR, DistilBERT classification, UI overlays, and UPI circuit-breaker all run 100% offline.
+- **Graceful Degradation:** Swarm agents queue evidence locally. WhatsApp alerts fall back to standard Android SMS via `SmsManager`.
+
+### Challenge 13: Legal Issues (Consent, Recording, Privacy)
+**The Problem:** Operating within Indian telegraph/IT acts and Play Store policies.
+**The Solution:** 
+- **No Recording:** Processing transient audio in RAM and discarding it (legally equivalent to "listening and taking notes").
+- **Consent:** Explicit, granular consent requested at onboarding.
+- **Play Store:** App accurately declares Accessibility Service usage for "safety confirmation screens."
+
+### Challenge 14: Real-Time Performance (1–2 Second End-to-End Latency)
+**The Problem:** Waiting for processing allows the scammer to manipulate the victim.
+**The Solution:** 
+- **Streaming ASR:** Whisper runs on 2-second partial chunks in parallel.
+- **Pipeline Parallelism:** ASR and video inference run on separate threads.
+- **Result:** ~343ms added latency to a 5000ms audio buffer, resulting in a warning within one sentence of the triggering utterance.
+
+### Challenge 15: Business Adoption & Liability
+**The Problem:** Banks won't adopt a tool if they are liable for false negatives.
+**The Solution:** 
+- ASTRA is positioned as a "customer safety feature" (second opinion tool), not a fraud prevention guarantee.
+- **Safe Harbor:** If a bank embeds ASTRA and it flags a legitimate transaction, the customer chooses to proceed. If it flags a scam and the customer stops, the bank gets the credit. Worst case is a 60-second inconvenience. Best case is ₹10 lakh saved.
+
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
@@ -372,109 +434,3 @@ Worst-case battery draw with all four layers active for a full hour: roughly 8%,
 - **Phase 3 :** Extend the taxonomy to grandparent scams, deepfake-celebrity investment fraud, and romance scams; expansion into Bangladesh, Pakistan, and the Philippines, which share the same attack pattern; formal government API integration; publish the annotated coercion-phase corpus as an open academic dataset
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
-
-<hr style="border: 2px solid #333; margin: 40px 0;">
-
-# ASTRA — Engineering Challenges & Production Solutions
-
-Building ASTRA required solving 15 hard engineering problems. Here are the challenges and the real engineering solutions implemented to make the platform robust, privacy-first, and highly effective.
-
-## CHALLENGE 1: Android Call Recording Restrictions
-**The Problem:** Google blocked third-party call audio capture on Android 10+. `MediaRecorder` returns silence for non-system apps.
-**The Solution (4 Paths):**
-- **Path A (VoIP Interception):** Use `MediaProjection` + `AudioPlaybackCapture` to capture the speaker output of VoIP calls (WhatsApp, Skype) without recording the mic. 94% of digital arrest scams occur on VoIP.
-- **Path B (OEM Privileged):** Pre-installed as `/system/priv-app` for full audio access (B2G roadmap).
-- **Path C (Earpiece Leakage):** Capturing via `AudioSource.MIC` when on speakerphone.
-- **Path D (Zero-Audio Metadata):** Monitoring call duration, frequency, and UPI app switches when no audio is available.
-
-## CHALLENGE 2: Privacy ("Is This App Listening to Me?")
-**The Problem:** Establishing user trust that the app isn't spyware.
-**The Solution:**
-- **Architecturally Enforced Privacy:** Audio and video never leave the device. `Whisper.cpp` runs locally in C++. The backend only receives a 0-1 score, phase labels, and a hashed number. Audio buffers are purged every 60 seconds.
-- **UI Signals:** Persistent status bar dot when active, prominent PAUSE button, and open-source audio pipeline.
-
-## CHALLENGE 3: False Positives (Real Police, Real Bank)
-**The Problem:** Flagging legitimate institutional calls ruins trust.
-**The Solution:**
-- **Calibrated Confidence UI:** Output calibrated scores with plain-language reasoning instead of binary labels.
-- **Whitelist Gate:** Saved contacts and verified bank numbers are never monitored.
-- **Phase Architecture:** A real police call might hit "Authority Claim" but will not hit "Isolation" or "Payment Demand." The distinct-phase gate prevents alerts for single-phase legitimate calls.
-
-## CHALLENGE 4: False Negatives (Evolving Scammer Tactics)
-**The Problem:** Scammers adapt keywords once defenses are known.
-**The Solution:** 
-- **Semantic Layer:** Move from keyword matching to semantic embeddings. The model learns the *concept* of authority impersonation (e.g., mapping "Income Tax", "CBI", "ED" to the same cluster).
-- **Continuous Retraining:** Automated script extraction from the Threat Intelligence Feed feeds a shadow model for A/B testing and OTA weight updates.
-
-## CHALLENGE 5: Heavy AI Models on ₹10,000 Phones
-**The Problem:** Running LLMs/Deepfake detectors drains battery and CPU.
-**The Solution:** 
-- **Cascaded Inference Architecture:** 
-  - Layer 0: CallDetector (Always on, <1% CPU)
-  - Layer 1: Whisper Tiny ASR (Activates on unknown number)
-  - Layer 2: DistilBERT INT8 (Activates on Phase keyword)
-  - Layer 3: Video frame sampling (Activates if Risk > 0.35)
-- **Result:** Worst-case battery draw is ~8% per hour. Total on-device AI model footprint is ~111MB.
-
-## CHALLENGE 6: Scope Honesty ("Can It Detect Every Scam?")
-**The Problem:** Overpromising detection capabilities.
-**The Solution:** ASTRA explicitly claims to detect Digital Arrest, Authority Impersonation, Parcel scams, and KYC suspension scams (68% of fraud losses). It explicitly does *not* claim to detect romance scams, investment scams, or simple SMS phishing.
-
-## CHALLENGE 7: Blocking UPI Isn't Easy
-**The Problem:** You cannot force-close Google Pay or intercept an initiated transaction.
-**The Solution:** 
-- **Accessibility Service Interception:** Detect when the user switches to a payment app and draw a full-screen overlay (highest z-order) over it.
-- **60-Second Cooling-Off:** Display a 60-second countdown requiring active confirmation to proceed. It breaks the payment path without permanently blocking the app.
-
-## CHALLENGE 8: Deepfake Detection Isn't Perfect
-**The Problem:** Deepfake detection struggles with compressed WhatsApp video.
-**The Solution:** The deepfake detector is a gated secondary amplifier, *not* the primary signal. It has a maximum 25% weight and only activates if the text narrative already shows suspicion. A scammy call with poor video is still caught by the narrative text arc.
-
-## CHALLENGE 9: Dataset Problem ("Where Did You Get Training Data?")
-**The Problem:** Lack of publicly available real-world scam datasets.
-**The Solution:** 
-- **Public Datasets:** Aggregated thousands of labeled examples utilizing [BothBosu Datasets](https://huggingface.co/datasets/BothBosu/multi-agent-scam-conversation) for multi-turn adversarial simulations, [FakeAVCeleb](https://sites.google.com/view/fakeavcelebdash-lab/) for lip-sync desynchronization, [DravidianCodeMix](https://github.com/dravidian-codemix/2021/) for colloquial syntax, and Kaggle's [Multilingual SMS Scam Dataset](https://www.kaggle.com/datasets/vinit119/sms-scam-detection-dataset-merged).
-- **Synthetic Augmentation:** Used Gemini 1.5 Pro to generate 500 code-mixed multilingual conversations based on the 5-phase arc.
-- **Manual Annotation:** Hand-labeled case summaries from cybercrime.gov.in.
-
-## CHALLENGE 10: Regional Languages (7+ Indian Languages)
-**The Problem:** Scam calls happen in local languages with heavy code-mixing.
-**The Solution:** 
-- **Tier 1:** Full pipeline for Hindi, Tamil, English fine-tuned on IndicVoices-R and DravidianCodeMix datasets.
-- **Code-Mixing:** Trained IndicBERT explicitly on Devanagari/Roman script mixed text.
-- **Tier 2:** ASR + Translation (IndicTrans2) for Telugu, Kannada, Malayalam.
-
-## CHALLENGE 11: Elderly People May Ignore Warnings
-**The Problem:** The most vulnerable demographic may ignore technical alerts.
-**The Solution:** 
-- **Guardian Mode:** Elderly user sees a simplified overlay ("Someone is trying to pressure you. Your family has been told."). 
-- **Simultaneous Action:** The family member receives a WhatsApp alert with the exact risk context and calls the victim, successfully overriding the scammer's "ignore that app" counter.
-
-## CHALLENGE 12: Internet Dependency
-**The Problem:** The system must protect the victim even if offline.
-**The Solution:** 
-- **Offline-First:** Audio capture, Whisper ASR, DistilBERT classification, UI overlays, and UPI circuit-breaker all run 100% offline.
-- **Graceful Degradation:** Swarm agents queue evidence locally. WhatsApp alerts fall back to standard Android SMS via `SmsManager`.
-
-## CHALLENGE 13: Legal Issues (Consent, Recording, Privacy)
-**The Problem:** Operating within Indian telegraph/IT acts and Play Store policies.
-**The Solution:** 
-- **No Recording:** Processing transient audio in RAM and discarding it (legally equivalent to "listening and taking notes").
-- **Consent:** Explicit, granular consent requested at onboarding.
-- **Play Store:** App accurately declares Accessibility Service usage for "safety confirmation screens."
-
-## CHALLENGE 14: Real-Time Performance (1–2 Second End-to-End Latency)
-**The Problem:** Waiting for processing allows the scammer to manipulate the victim.
-**The Solution:** 
-- **Streaming ASR:** Whisper runs on 2-second partial chunks in parallel.
-- **Pipeline Parallelism:** ASR and video inference run on separate threads.
-- **Result:** ~343ms added latency to a 5000ms audio buffer, resulting in a warning within one sentence of the triggering utterance.
-
-## CHALLENGE 15: Business Adoption & Liability
-**The Problem:** Banks won't adopt a tool if they are liable for false negatives.
-**The Solution:** 
-- ASTRA is positioned as a "customer safety feature" (second opinion tool), not a fraud prevention guarantee.
-- **Safe Harbor:** If a bank embeds ASTRA and it flags a legitimate transaction, the customer chooses to proceed. If it flags a scam and the customer stops, the bank gets the credit. Worst case is a 60-second inconvenience. Best case is ₹10 lakh saved.
-
-
-
