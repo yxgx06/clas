@@ -89,7 +89,7 @@ Why does sequence matter so much? Because a call that opens with Phase 5 languag
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
-## Part 12: The 3-Minute Demo, Beat by Beat
+## Part 3: The 3-Minute Demo, Beat by Beat
 
 ![Circuit Breaker Interception UI](./assets/circuit_breaker_ui.png)
 
@@ -103,7 +103,7 @@ Why does sequence matter so much? Because a call that opens with Phase 5 languag
 | 2:35–2:50 | Physical proof | A judge's pre-registered phone audibly buzzes with the WhatsApp alert — the single strongest non-technical proof point in the entire demo |
 | 2:50–3:00 | Close | Dashboard shows the number auto-flagged nationally and the NCRP evidence packet pre-filled, ready in one tap |
 
-The rehearsal discipline behind this: both phones on shared WiFi, backend deployed (never localhost during a live demo), judge's phone pre-registered as a trusted contact, the scam script rehearsed verbatim in exact order, GPay pre-launched, and — critically — a full screen-recorded fallback video always on hand. Never demo a broken pipeline live.
+The rehearsal discipline behind this: both phones on shared WiFi, backend deployed (never localhost during a live demo), judge's phone pre-registered as a trusted contact, the scam script rehearsed verbatim in exact order, GPay pre-launched, and — critically — a full screen-recorded fallback video always on hand.
 
 <hr style="border: 2px solid #333; margin: 40px 0;">
 
