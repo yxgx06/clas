@@ -49,18 +49,18 @@ This is the story of **ASTRA** — a system built to occupy the one part of the 
 
 ## The Empty Middle Column
 
-![Gemini Generated Image](./assets/gemini_custom_image.png)
+![Fraud Prevention Gap](./assets/fraud_prevention_gap.png)
 
 Every anti-fraud product in existence falls into one of two buckets — before the call, or after the money is gone.
 
 | Defense Layer | What It Does | When It Fires | The Gap |
 |---|---|---|---|
 | Telecom spoofing blocks | Blocks fake international caller IDs | Pre-call | Scammers use domestic SIM farms + WhatsApp/Skype, bypassing telecom entirely |
-| Audio-authenticity detectors (Pindrop, Google's fake-call detection) | Determines if a *voice* is synthetic | During call, narrow scope | Fails completely against a live human scammer reading a script — the majority case in India |
+| Audio-authenticity detectors | Determines if a *voice* is synthetic | During call, narrow scope | Fails completely against a live human scammer reading a script |
 | Deepfake takedown rules | Platforms remove flagged content | Post-call, +3 hours | Money is already gone in 15 minutes |
 | Bank AI fraud flags | Flags unusual transfer patterns | Post-transfer | The victim *authorized* the transfer under duress — banks legally cannot reverse it |
 | 1930 helpline / NCRP | Cybercrime reporting hotline | Post-loss | Mule-account freezing takes days; 51% never even file |
-| Public awareness campaigns | "Don't pay, verify first" | Pre-call, passive | Fails under sustained psychological siege — see the 92-year-old case |
+| Public awareness campaigns | "Don't pay, verify first" | Pre-call, passive | Fails under sustained psychological siege |
 | **ASTRA** | **Multimodal coercion-pattern detection + payment circuit-breaker + autonomous evidence swarm** | **DURING the call** | **This row didn't exist before** |
 
 The one-line pitch we built the entire system around:
@@ -71,7 +71,7 @@ The one-line pitch we built the entire system around:
 
 ## The Core Insight — Scams Aren't Improvised, They're Scripted
 
-![Second Gemini Generated Image](./assets/gemini_custom_image_2.png)
+![Coercion Script Arc](./assets/coercion_script_arc.png)
 
 The single most important engineering decision in ASTRA comes from a hypothesis that turned out to be true: **digital-arrest scams follow a documented, repeating five-stage narrative arc**, independent of language, independent of whether the caller is a live human or an AI clone, and — critically — **sequence-dependent**.
 
@@ -86,6 +86,28 @@ The single most important engineering decision in ASTRA comes from a hypothesis 
 | 5 | **PAYMENT_DEMAND** | The financial ask — "security deposit," verification fee, via UPI or OTP | "2 lakh security deposit transfer karo" | "1 lakh Google Pay-la transfer panningal" |
 
 Why does sequence matter so much? Because a call that opens with Phase 5 language — a legitimate bank calling about a fraudulent OTP — scores fundamentally differently from a call that reaches Phase 5 only *after* Phases 1→3→4 have fired in order. A system that scores markers as an unordered bag cannot make this distinction. A system that tracks them as an ordered arc can. This single architectural choice is the strongest answer to the most common objection a system like this receives: *"isn't this just keyword matching?"*
+
+<hr style="border: 2px solid #333; margin: 40px 0 70px 0;">
+
+## System Evaluation
+
+![ASTRA Evaluation Graph](./assets/evaluation_graph.png)
+
+### TAMIL EVALUATION RESULTS
+| Metric | Keyword Only | Bag of Markers | ASTRA Full |
+| :--- | :---: | :---: | :---: |
+| Recall (Set A - Scams) | 0.704 | 0.848 | 0.953 |
+| FPR (Set B - Legit) | 0.258 | 0.116 | 0.046 |
+| Recall (Set D - Adversarial) | 0.124 | 0.224 | 0.866 |
+| **Overall F1-Score** | **0.684** | **0.824** | **0.928** |
+
+### HINDI EVALUATION RESULTS
+| Metric | Keyword Only | Bag of Markers | ASTRA Full |
+| :--- | :---: | :---: | :---: |
+| Recall (Set A - Scams) | 0.727 | 0.855 | 0.953 |
+| FPR (Set B - Legit) | 0.221 | 0.131 | 0.029 |
+| Recall (Set D - Adversarial) | 0.091 | 0.250 | 0.874 |
+| **Overall F1-Score** | **0.714** | **0.840** | **0.937** |
 
 <hr style="border: 2px solid #333; margin: 40px 0 70px 0;">
 
@@ -122,4 +144,5 @@ None of those are marketing problems to paper over. They're engineering problems
 <div align="center">
   <br>
   <h3><a href="./technical_details.md"> View the Complete Technical Deep Dive & Challenges Here</a></h3>
+  <h3><a href="./progress_update.md"> 🚀 View Our Latest Development Progress Here</a></h3>
 </div>
