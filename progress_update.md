@@ -14,7 +14,25 @@ Because public multilingual scam transcripts do not exist, we built a robust hyb
 **Training & Testing Methodology:**
 We fine-tuned a DistilBERT-multilingual classifier on noise-augmented text (simulating real ASR errors and hesitation markers) using sequential phase-gating formulas instead of simple keyword matching. The architecture was rigorously evaluated across 5 held-out adversarial test sets—ensuring high recall on disguised scam scripts while strictly suppressing false positives on real bank/police calls.
 
+**System Evaluation:**
+
 ![ASTRA Evaluation Graph](./assets/evaluation_graph.png)
+
+### TAMIL EVALUATION RESULTS
+| Metric | Keyword Only | Bag of Markers | ASTRA Full |
+| :--- | :---: | :---: | :---: |
+| Recall (Set A - Scams) | 0.704 | 0.848 | 0.953 |
+| FPR (Set B - Legit) | 0.258 | 0.116 | 0.046 |
+| Recall (Set D - Adversarial) | 0.124 | 0.224 | 0.866 |
+| **Overall F1-Score** | **0.684** | **0.824** | **0.928** |
+
+### HINDI EVALUATION RESULTS
+| Metric | Keyword Only | Bag of Markers | ASTRA Full |
+| :--- | :---: | :---: | :---: |
+| Recall (Set A - Scams) | 0.727 | 0.855 | 0.953 |
+| FPR (Set B - Legit) | 0.221 | 0.131 | 0.029 |
+| Recall (Set D - Adversarial) | 0.091 | 0.250 | 0.874 |
+| **Overall F1-Score** | **0.714** | **0.840** | **0.937** |
 
 ### 2. Web Dashboard Demo
 We have commenced building the Web App demo. This serves as a centralized Next.js command dashboard powered by an async FastAPI backend.

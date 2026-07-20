@@ -89,28 +89,6 @@ Why does sequence matter so much? Because a call that opens with Phase 5 languag
 
 <hr style="border: 2px solid #333; margin: 40px 0 70px 0;">
 
-## System Evaluation
-
-![ASTRA Evaluation Graph](./assets/evaluation_graph.png)
-
-### TAMIL EVALUATION RESULTS
-| Metric | Keyword Only | Bag of Markers | ASTRA Full |
-| :--- | :---: | :---: | :---: |
-| Recall (Set A - Scams) | 0.704 | 0.848 | 0.953 |
-| FPR (Set B - Legit) | 0.258 | 0.116 | 0.046 |
-| Recall (Set D - Adversarial) | 0.124 | 0.224 | 0.866 |
-| **Overall F1-Score** | **0.684** | **0.824** | **0.928** |
-
-### HINDI EVALUATION RESULTS
-| Metric | Keyword Only | Bag of Markers | ASTRA Full |
-| :--- | :---: | :---: | :---: |
-| Recall (Set A - Scams) | 0.727 | 0.855 | 0.953 |
-| FPR (Set B - Legit) | 0.221 | 0.131 | 0.029 |
-| Recall (Set D - Adversarial) | 0.091 | 0.250 | 0.874 |
-| **Overall F1-Score** | **0.714** | **0.840** | **0.937** |
-
-<hr style="border: 2px solid #333; margin: 40px 0 70px 0;">
-
 ## The 3-Minute Demo, Beat by Beat
 
 ![Circuit Breaker Interception UI](./assets/circuit_breaker_ui.png)
@@ -144,5 +122,5 @@ None of those are marketing problems to paper over. They're engineering problems
 <div align="center">
   <br>
   <h3><a href="./technical_details.md"> View the Complete Technical Deep Dive & Challenges Here</a></h3>
-  <h3><a href="./progress_update.md"> 🚀 View Our Latest Development Progress Here</a></h3>
+  <h3><a href="./progress_update.md"> View Our Latest Development Progress Here</a></h3>
 </div>
